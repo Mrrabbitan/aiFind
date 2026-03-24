@@ -295,7 +295,7 @@ export default function FlowManager() {
             return (
               <article
                 key={task.id}
-                className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900/95"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1 space-y-3">
@@ -417,39 +417,41 @@ export default function FlowManager() {
                           </div>
                         ) : null}
 
-                        <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                        <h3 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-50">
                           流程步骤
                         </h3>
-                        <ol className="relative ml-2 border-l-2 border-zinc-200 pl-10 dark:border-zinc-700">
+                        <ol className="relative ml-1 border-l-2 border-zinc-200 pl-11 dark:border-zinc-700">
                           {steps.map((step) => (
                             <li
                               key={step.id ?? step.step_order}
-                              className="relative pb-8 last:pb-0"
+                              className="relative pb-6 last:pb-0"
                             >
-                              <span className="absolute -left-4 top-0.5 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-zinc-100 text-xs font-bold text-zinc-700 shadow-sm dark:border-zinc-900 dark:bg-zinc-800 dark:text-zinc-200">
+                              <span className="absolute -left-[1.15rem] top-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-zinc-100 text-xs font-bold text-zinc-700 shadow-sm dark:border-zinc-900 dark:bg-zinc-800 dark:text-zinc-200">
                                 {step.step_order}
                               </span>
-                              <div className="flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                              <div className="rounded-lg border border-zinc-200/80 bg-zinc-50/60 px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/40">
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-medium leading-6 text-zinc-900 dark:text-zinc-50">
                                     {step.name}
-                                  </p>
-                                  <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                                    </p>
+                                    <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
                                     {step.description}
-                                  </p>
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <AutomationBadge automation={step.automation} />
+                                    <StepStatusIcon status={step.status} />
+                                  </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <AutomationBadge automation={step.automation} />
-                                  <StepStatusIcon status={step.status} />
-                                </div>
+                                {Array.isArray(step.sub_steps) && step.sub_steps.length > 0 ? (
+                                  <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+                                    {step.sub_steps.map((sub, i) => (
+                                      <li key={i}>{sub}</li>
+                                    ))}
+                                  </ul>
+                                ) : null}
                               </div>
-                              {Array.isArray(step.sub_steps) && step.sub_steps.length > 0 ? (
-                                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-zinc-600 dark:text-zinc-400">
-                                  {step.sub_steps.map((sub, i) => (
-                                    <li key={i}>{sub}</li>
-                                  ))}
-                                </ul>
-                              ) : null}
                             </li>
                           ))}
                         </ol>
