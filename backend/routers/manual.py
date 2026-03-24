@@ -1,8 +1,12 @@
-"""操作手册 API：订单采集流程分步与对标矩阵（基于 Sheet2 数据）。"""
+"""操作手册 API：订单采集流程分步、对标矩阵与 hbaseTest 样例资产。"""
 
+import hashlib
+from pathlib import Path
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/api/manual", tags=["manual"])
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+HBASE_TEST_DIR = PROJECT_ROOT / "hbaseTest"
 
 OPERATIONS_MANUAL = [
     {
@@ -365,6 +369,28 @@ BENCHMARK_MATRIX = [
     {"dimension": "成本分析", "alibaba": "资源优化", "tencent": "冷热分层/成本治理", "bytedance": "资源利用率优化", "current": "无", "gap": "P2", "plan": "Phase 3"},
 ]
 
+SCRIPT_FILES = [
+    "prepare_complete_bulkload_pb.sh",
+    "prepare_complete_bulkload_pb_0x0A.sh",
+    "新建采集还原配置文件.txt",
+    "导出需要修改和新增配置文件以及执行的脚本.txt",
+    "hdfs到外表执行脚本.txt",
+]
+
+JAR_FILES = [
+    "OggKafkaToHbase_PBV3.jar",
+    "OggKafkaToHbase_PBV5.jar",
+    "QueryHbaseTable.jar",
+    "hbasesub19-utils-jar-with-dependencies.jar",
+]
+
+JAR_EXAMPLES = {
+    "QueryHbaseTable.jar": "java -cp QueryHbaseTable.jar cn.com.bonc.CreateTable <zk_hosts> <zk_parent> <pre_regions> <compression> <namespace:table> <zk_port>",
+    "OggKafkaToHbase_PBV3.jar": "在 BDI/Flink 任务中配置主类与参数，作为 Kafka -> HBase 增量还原作业的运行包",
+    "OggKafkaToHbase_PBV5.jar": "在 BDI/Flink 任务中配置主类与参数，作为 Kafka -> HBase 增量还原作业（新版协议）运行包",
+    "hbasesub19-utils-jar-with-dependencies.jar": "用于 HBase 辅助工具调用，常用于查询/导出/校验链路中的依赖包",
+}
+
 
 def _total_operations() -> int:
     return sum(len(s["operations"]) for s in OPERATIONS_MANUAL)
@@ -390,6 +416,45 @@ def _manual_summary() -> dict:
     }
 
 
+def _sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _load_samples() -> dict:
+    scripts = []
+    jars = []
+    if HBASE_TEST_DIR.exists():
+        for name in SCRIPT_FILES:
+            p = HBASE_TEST_DIR / name
+            if p.exists() and p.is_file():
+                scripts.append(
+                    {
+                        "name": name,
+                        "path": str(p),
+                        "size_bytes": p.stat().st_size,
+                        "content": p.read_text(encoding="utf-8", errors="replace"),
+                        "usage": "可直接在操作手册中作为执行模板复制使用",
+                    }
+                )
+        for name in JAR_FILES:
+            p = HBASE_TEST_DIR / name
+            if p.exists() and p.is_file():
+                jars.append(
+                    {
+                        "name": name,
+                        "path": str(p),
+                        "size_bytes": p.stat().st_size,
+                        "sha256": _sha256(p),
+                        "usage_example": JAR_EXAMPLES.get(name, "请参考任务平台中的主类参数配置"),
+                    }
+                )
+    return {"scripts": scripts, "jars": jars, "folder": str(HBASE_TEST_DIR)}
+
+
 @router.get("")
 def get_manual():
     return {
@@ -402,6 +467,18 @@ def get_manual():
 @router.get("/benchmark")
 def get_benchmark():
     return {"matrix": BENCHMARK_MATRIX}
+
+
+@router.get("/samples")
+def get_sample_assets():
+    data = _load_samples()
+    return {
+        "folder": data["folder"],
+        "script_count": len(data["scripts"]),
+        "jar_count": len(data["jars"]),
+        "scripts": data["scripts"],
+        "jars": data["jars"],
+    }
 
 
 @router.get("/steps/{step_id}")

@@ -144,6 +144,7 @@ function StatMiniCard({ icon: Icon, label, value, accent }) {
 export default function Manual() {
   const [manual, setManual] = useState(null);
   const [benchmark, setBenchmark] = useState(null);
+  const [samples, setSamples] = useState(null);
   const [tab, setTab] = useState("flow");
   const [expanded, setExpanded] = useState(() => new Set(["step-1"]));
   const [opExpanded, setOpExpanded] = useState(() => new Set());
@@ -157,6 +158,10 @@ export default function Manual() {
       .then((r) => r.json())
       .then(setBenchmark)
       .catch(() => setBenchmark({ rows: [] }));
+    fetch("/api/manual/samples")
+      .then((r) => r.json())
+      .then(setSamples)
+      .catch(() => setSamples({ scripts: [], jars: [] }));
   }, []);
 
   const { steps } = useMemo(() => normalizeManual(manual), [manual]);
@@ -278,6 +283,18 @@ export default function Manual() {
           >
             对标矩阵
           </button>
+          <button
+            type="button"
+            onClick={() => setTab("samples")}
+            className={[
+              "rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-300",
+              tab === "samples"
+                ? "bg-white text-indigo-700 shadow-sm ring-1 ring-slate-200/90 dark:bg-slate-900 dark:text-indigo-300 dark:ring-slate-600"
+                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white",
+            ].join(" ")}
+          >
+            脚本/JAR样例
+          </button>
         </div>
       </header>
 
@@ -335,10 +352,11 @@ export default function Manual() {
                 const open = expanded.has(stepKey);
                 const name = step.name ?? step.title ?? `步骤 ${num}`;
                 const category = step.category ?? step.stage ?? "";
-                const systems = Array.isArray(step.systems)
-                  ? step.systems
-                  : typeof step.systems === "string"
-                    ? step.systems.split(/[,，]/).map((s) => s.trim()).filter(Boolean)
+                const systemsRaw = step.systems ?? step.system ?? [];
+                const systems = Array.isArray(systemsRaw)
+                  ? systemsRaw
+                  : typeof systemsRaw === "string"
+                    ? systemsRaw.split(/[,，]/).map((s) => s.trim()).filter(Boolean)
                     : [];
                 const autoMode = step.automation ?? step.auto ?? "";
                 const risk = step.risk ?? step.riskLevel ?? "";
@@ -613,7 +631,7 @@ export default function Manual() {
             </ul>
           </div>
         </>
-      ) : (
+      ) : tab === "benchmark" ? (
         <section className="rounded-2xl border border-slate-200/90 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
           {benchmark === null ? (
             <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 p-8">
@@ -712,6 +730,43 @@ export default function Manual() {
               </table>
             </div>
           )}
+        </section>
+      ) : (
+        <section className="space-y-5">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+            当前样例目录：<span className="font-mono">{samples?.folder || "/hbaseTest"}</span>
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+              <h3 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">脚本样例 ({samples?.script_count ?? 0})</h3>
+              <div className="space-y-4">
+                {(samples?.scripts || []).map((s) => (
+                  <div key={s.name} className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{s.name}</p>
+                    <p className="mb-2 text-xs text-slate-500">{s.path}</p>
+                    <pre className="max-h-64 overflow-auto rounded-lg border border-slate-800 bg-slate-900 p-3 font-mono text-xs leading-relaxed text-green-400">
+                      {s.content}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+              <h3 className="mb-3 text-base font-semibold text-slate-900 dark:text-white">JAR 样例 ({samples?.jar_count ?? 0})</h3>
+              <div className="space-y-3">
+                {(samples?.jars || []).map((j) => (
+                  <div key={j.name} className="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/40">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{j.name}</p>
+                    <p className="text-xs text-slate-500">大小：{j.size_bytes} bytes</p>
+                    <p className="truncate text-xs text-slate-500">SHA256：{j.sha256}</p>
+                    <p className="mt-2 text-xs text-slate-700 dark:text-slate-300">用法：{j.usage_example}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
       )}
     </div>
