@@ -145,7 +145,8 @@ export default function Manual() {
   const [manual, setManual] = useState(null);
   const [benchmark, setBenchmark] = useState(null);
   const [tab, setTab] = useState("flow");
-  const [expanded, setExpanded] = useState(() => new Set([0]));
+  const [expanded, setExpanded] = useState(() => new Set(["step-1"]));
+  const [opExpanded, setOpExpanded] = useState(() => new Set());
 
   useEffect(() => {
     fetch("/api/manual")
@@ -188,11 +189,20 @@ export default function Manual() {
 
   const loading = manual === null;
 
-  const toggleStep = (idx) => {
+  const toggleStep = (stepKey) => {
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
+      if (next.has(stepKey)) next.delete(stepKey);
+      else next.add(stepKey);
+      return next;
+    });
+  };
+
+  const toggleOperation = (opKey) => {
+    setOpExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(opKey)) next.delete(opKey);
+      else next.add(opKey);
       return next;
     });
   };
@@ -320,8 +330,9 @@ export default function Manual() {
                 </li>
               ) : null}
               {steps.map((step, idx) => {
-                const open = expanded.has(idx);
                 const num = step.number ?? step.step ?? idx + 1;
+                const stepKey = `step-${num}`;
+                const open = expanded.has(stepKey);
                 const name = step.name ?? step.title ?? `步骤 ${num}`;
                 const category = step.category ?? step.stage ?? "";
                 const systems = Array.isArray(step.systems)
@@ -353,7 +364,7 @@ export default function Manual() {
                     >
                       <button
                         type="button"
-                        onClick={() => toggleStep(idx)}
+                        onClick={() => toggleStep(stepKey)}
                         className="flex w-full items-start gap-4 p-5 text-left transition-colors duration-300 hover:bg-slate-50/80 dark:hover:bg-slate-800/50"
                       >
                         <div
@@ -419,13 +430,11 @@ export default function Manual() {
                         </div>
                       </button>
 
-                      <div
-                        className={`grid transition-all duration-300 ease-out ${
-                          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-                        }`}
-                      >
-                        <div className="min-h-0 overflow-hidden">
-                          <div className="border-t border-slate-100 bg-slate-50/80 px-5 py-5 dark:border-slate-800 dark:bg-slate-950/40">
+                      {open ? (
+                        <div className="border-t border-slate-100 bg-slate-50/80 px-5 py-5 transition-all duration-300 dark:border-slate-800 dark:bg-slate-950/40">
+                          <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-xs text-indigo-800 dark:border-indigo-700/50 dark:bg-indigo-950/30 dark:text-indigo-200">
+                            自动化标注说明：<span className="font-semibold">自动</span> = 可系统自动执行；<span className="font-semibold">半自动</span> = 系统生成结果后人工确认；<span className="font-semibold">人工</span> = 必须人工操作。
+                          </div>
                             {ops.length === 0 ? (
                               <p className="text-sm text-slate-500 dark:text-slate-500">
                                 暂无子操作说明（请在后端配置 operations 列表）。
@@ -439,6 +448,7 @@ export default function Manual() {
                                     `${num}.${oi + 1}`;
                                   const oname = op.name ?? op.title ?? "操作";
                                   const otype = op.type ?? op.kind ?? "";
+                                  const opAuto = automationLabel(op.type ?? step.automation ?? "");
                                   const odesc =
                                     op.description ?? op.detail ?? "";
                                   const cmd = op.command ?? op.cmd ?? op.shell;
@@ -455,12 +465,26 @@ export default function Manual() {
                                   const orisk =
                                     op.riskLevel ?? op.risk ?? "";
 
+                                  const opKey = `step-${num}-op-${oid}`;
+                                  const opOpen = opExpanded.has(opKey);
                                   return (
                                     <li
                                       key={`${oid}-${oi}`}
                                       className="rounded-xl border border-slate-200/90 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
                                     >
                                       <div className="flex flex-wrap items-start gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleOperation(opKey)}
+                                          className="inline-flex h-6 w-6 items-center justify-center rounded border border-slate-300 text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+                                          title={opOpen ? "收起详情" : "展开详情"}
+                                        >
+                                          {opOpen ? (
+                                            <ChevronUp className="h-3.5 w-3.5" />
+                                          ) : (
+                                            <ChevronDown className="h-3.5 w-3.5" />
+                                          )}
+                                        </button>
                                         <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 font-mono text-xs font-bold text-indigo-800 ring-1 ring-indigo-200/80 dark:bg-indigo-950/50 dark:text-indigo-200 dark:ring-indigo-700/50">
                                           {String(oid)}
                                         </span>
@@ -472,6 +496,9 @@ export default function Manual() {
                                             {otype}
                                           </span>
                                         ) : null}
+                                        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${automationBadgeClass(opAuto)}`}>
+                                          {opAuto === "人工" ? "人工确认" : opAuto}
+                                        </span>
                                         <span
                                           className="ml-auto inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400"
                                           title="操作风险"
@@ -481,14 +508,16 @@ export default function Manual() {
                                           />
                                         </span>
                                       </div>
-                                      {odesc ? (
-                                        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                                          {odesc}
-                                        </p>
-                                      ) : null}
+                                      {opOpen ? (
+                                        <div>
+                                          {odesc ? (
+                                            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                              {odesc}
+                                            </p>
+                                          ) : null}
 
-                                      {cmd ? (
-                                        <div className="mt-3">
+                                          {cmd ? (
+                                            <div className="mt-3">
                                           <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-500">
                                             <Terminal className="h-3.5 w-3.5" aria-hidden />
                                             命令
@@ -496,11 +525,11 @@ export default function Manual() {
                                           <pre className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-900 p-3 font-mono text-xs leading-relaxed text-green-400 shadow-inner">
                                             {String(cmd)}
                                           </pre>
-                                        </div>
-                                      ) : null}
+                                            </div>
+                                          ) : null}
 
-                                      {params.length > 0 ? (
-                                        <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                                          {params.length > 0 ? (
+                                            <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
                                           <table className="min-w-full text-left text-sm">
                                             <thead>
                                               <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400">
@@ -549,11 +578,11 @@ export default function Manual() {
                                               ))}
                                             </tbody>
                                           </table>
-                                        </div>
-                                      ) : null}
+                                            </div>
+                                          ) : null}
 
-                                      {tips.length > 0 ? (
-                                        <div className="mt-3 space-y-2">
+                                          {tips.length > 0 ? (
+                                            <div className="mt-3 space-y-2">
                                           {tips.map((t, ti) => (
                                             <div
                                               key={ti}
@@ -566,6 +595,8 @@ export default function Manual() {
                                               <p className="leading-relaxed">{t}</p>
                                             </div>
                                           ))}
+                                            </div>
+                                          ) : null}
                                         </div>
                                       ) : null}
                                     </li>
@@ -573,9 +604,8 @@ export default function Manual() {
                                 })}
                               </ul>
                             )}
-                          </div>
                         </div>
-                      </div>
+                      ) : null}
                     </article>
                   </li>
                 );

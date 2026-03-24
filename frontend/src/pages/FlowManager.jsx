@@ -420,13 +420,13 @@ export default function FlowManager() {
                         <h3 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                           流程步骤
                         </h3>
-                        <ol className="relative ml-1 border-l-2 border-zinc-200 pl-8 dark:border-zinc-700">
+                        <ol className="relative ml-2 border-l-2 border-zinc-200 pl-10 dark:border-zinc-700">
                           {steps.map((step) => (
                             <li
                               key={step.id ?? step.step_order}
                               className="relative pb-8 last:pb-0"
                             >
-                              <span className="absolute -left-[calc(1rem+1px)] top-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-zinc-100 text-xs font-bold text-zinc-700 shadow-sm dark:border-zinc-900 dark:bg-zinc-800 dark:text-zinc-200">
+                              <span className="absolute -left-4 top-0.5 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-zinc-100 text-xs font-bold text-zinc-700 shadow-sm dark:border-zinc-900 dark:bg-zinc-800 dark:text-zinc-200">
                                 {step.step_order}
                               </span>
                               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -485,7 +485,7 @@ export default function FlowManager() {
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800"
+                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder:text-zinc-400"
                 />
               </div>
               <div>
@@ -499,7 +499,7 @@ export default function FlowManager() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, table_name: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800"
+                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder:text-zinc-400"
                 />
               </div>
               <div>
@@ -511,7 +511,7 @@ export default function FlowManager() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, task_type: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800"
+                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                 >
                   <option value="full+incremental">全量 + 增量</option>
                   <option value="incremental-only">仅增量</option>
@@ -530,7 +530,7 @@ export default function FlowManager() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, file_size_gb: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800"
+                  className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                 />
               </div>
               {formError ? (

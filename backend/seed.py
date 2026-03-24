@@ -6,6 +6,7 @@ from backend.models import (
     MonitorEvent, KnowledgeArticle, SystemMetric,
 )
 from backend.services.ai_engine import STEP_TEMPLATES
+from backend.routers.manual import OPERATIONS_MANUAL
 
 _now = _dt.datetime.utcnow
 
@@ -135,6 +136,24 @@ def seed():
         ))
 
     # --- 知识文章 ---
+    manual_lines = ["## 订单采集场景（第二个Sheet）全量步骤明细", ""]
+    for step in OPERATIONS_MANUAL:
+        manual_lines.append(f"### Step {step['step']}：{step['name']}")
+        manual_lines.append(f"- 分类：{step.get('category', '—')}")
+        manual_lines.append(f"- 系统：{', '.join(step.get('system', []))}")
+        manual_lines.append(f"- 自动化：{step.get('automation', '—')}")
+        manual_lines.append(f"- 说明：{step.get('description', '')}")
+        manual_lines.append("")
+        for op in step.get("operations", []):
+            manual_lines.append(f"- `{op.get('id', '')}` {op.get('name', '')}（{op.get('type', '—')}）")
+            if op.get("command"):
+                manual_lines.append(f"  - 命令：`{op.get('command')}`")
+            tips = op.get("tips") or []
+            if tips:
+                manual_lines.append(f"  - 注意：{'；'.join(tips)}")
+        manual_lines.append("")
+    sheet2_full_content = "\n".join(manual_lines)
+
     articles = [
         {
             "title": "HBase 预分区数计算规则",
@@ -230,6 +249,12 @@ def seed():
                 "## 参数说明\n\n"
                 "```bash\nsh hdfscp.sh D07058 20260121 /user/tenants/.../cbssdata 202601 21 ext_src_d_bcd07058_bak\n```"
             ),
+        },
+        {
+            "title": "订单采集场景第二个Sheet全量内容",
+            "category": "reference",
+            "tags": "订单采集,Sheet2,全流程,16项操作,自动化",
+            "content": sheet2_full_content,
         },
     ]
     for ad in articles:
