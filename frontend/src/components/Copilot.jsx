@@ -104,7 +104,7 @@ async function apiPost(path, body) {
 function ResultBlock({ data, error, loading }) {
   if (loading) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
         请求中…
       </div>
     );
@@ -120,7 +120,7 @@ function ResultBlock({ data, error, loading }) {
 
   if (typeof data !== "object") {
     return (
-      <pre className="max-h-40 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800">
+      <pre className="max-h-40 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
         {String(data)}
       </pre>
     );
@@ -133,11 +133,11 @@ function ResultBlock({ data, error, loading }) {
 
   if (flat) {
     return (
-      <dl className="grid max-h-48 gap-2 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+      <dl className="grid max-h-48 gap-2 overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800">
         {Object.entries(data).map(([k, v]) => (
-          <div key={k} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-slate-100 pb-2 last:border-0 last:pb-0">
-            <dt className="font-medium text-slate-600">{k}</dt>
-            <dd className="break-all font-mono text-xs text-slate-900">
+          <div key={k} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-2 border-b border-slate-100 pb-2 last:border-0 last:pb-0 dark:border-slate-700">
+            <dt className="font-medium text-slate-600 dark:text-slate-300">{k}</dt>
+            <dd className="break-all font-mono text-xs text-slate-900 dark:text-slate-100">
               {typeof v === "object" ? JSON.stringify(v) : String(v)}
             </dd>
           </div>
@@ -147,7 +147,7 @@ function ResultBlock({ data, error, loading }) {
   }
 
   return (
-    <pre className="max-h-48 overflow-auto rounded-xl border border-slate-200 bg-slate-900/5 p-3 text-xs leading-relaxed text-slate-800">
+    <pre className="max-h-48 overflow-auto rounded-xl border border-slate-200 bg-slate-900/5 p-3 text-xs leading-relaxed text-slate-800 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
       {JSON.stringify(data, null, 2)}
     </pre>
   );
@@ -277,32 +277,32 @@ export default function Copilot() {
       <div
         ref={panelRef}
         className={[
-          "fixed bottom-0 right-6 z-40 flex w-96 max-h-[70vh] flex-col rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out",
+          "fixed bottom-0 right-6 z-40 flex w-96 max-h-[70vh] flex-col rounded-t-2xl border border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-out dark:border-slate-700 dark:bg-slate-900",
           open ? "translate-y-0" : "translate-y-full pointer-events-none",
         ].join(" ")}
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-4 py-3">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300">
               <Bot className="h-5 w-5" aria-hidden />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">AI Copilot</h2>
-              <p className="text-xs text-slate-500">采集流程助手</p>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">AI Copilot</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">采集流程助手</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             aria-label="关闭"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="flex shrink-0 border-b border-slate-100 px-2">
+        <div className="flex shrink-0 border-b border-slate-100 px-2 dark:border-slate-800">
           <button
             type="button"
             onClick={() => setTab("accelerate")}
@@ -310,7 +310,7 @@ export default function Copilot() {
               "flex flex-1 items-center justify-center gap-1.5 border-b-2 py-2.5 text-sm font-medium transition",
               tab === "accelerate"
                 ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-500 hover:text-slate-700",
+                : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
             ].join(" ")}
           >
             <Zap className="h-4 w-4" />
@@ -323,7 +323,7 @@ export default function Copilot() {
               "flex flex-1 items-center justify-center gap-1.5 border-b-2 py-2.5 text-sm font-medium transition",
               tab === "explore"
                 ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-500 hover:text-slate-700",
+                : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200",
             ].join(" ")}
           >
             <MessageSquare className="h-4 w-4" />
@@ -334,15 +334,15 @@ export default function Copilot() {
         <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
           {tab === "accelerate" && (
             <div className="space-y-3">
-              <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                <label htmlFor="copilot-table" className="text-xs font-medium text-slate-600">
+              <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/60">
+                <label htmlFor="copilot-table" className="text-xs font-medium text-slate-600 dark:text-slate-300">
                   表名（用于 AI 参数推荐）
                 </label>
                 <input
                   id="copilot-table"
                   value={tableName}
                   onChange={(e) => setTableName(e.target.value)}
-                  className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm outline-none ring-indigo-500 focus:ring-2"
+                  className="mt-1 w-full rounded-md border border-slate-200 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none ring-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                   placeholder="例如 tf_oh_xxx"
                 />
               </div>
@@ -354,20 +354,20 @@ export default function Copilot() {
                     type="button"
                     disabled={!!actionLoading}
                     onClick={onClick}
-                    className="flex flex-col items-start gap-1 rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-indigo-200 hover:shadow-md disabled:opacity-60"
+                    className="flex flex-col items-start gap-1 rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-indigo-200 hover:shadow-md disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-indigo-700"
                   >
                     <Icon
                       className="h-5 w-5 text-indigo-600"
                       aria-hidden
                     />
-                    <span className="text-sm font-medium text-slate-900">{label}</span>
-                    <span className="text-xs text-slate-500">{desc}</span>
+                    <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{label}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">{desc}</span>
                   </button>
                 ))}
               </div>
 
               <div>
-                <p className="mb-1 text-xs font-medium text-slate-500">执行结果</p>
+                <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">执行结果</p>
                 <ResultBlock
                   data={actionData}
                   error={actionError}
@@ -398,7 +398,7 @@ export default function Copilot() {
                   </div>
                 ))}
               </div>
-              <div className="mt-2 flex shrink-0 gap-2 border-t border-slate-100 pt-2">
+              <div className="mt-2 flex shrink-0 gap-2 border-t border-slate-100 pt-2 dark:border-slate-800">
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
@@ -408,7 +408,7 @@ export default function Copilot() {
                       sendExplore();
                     }
                   }}
-                  className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-indigo-500 focus:ring-2"
+                  className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                   placeholder="输入问题或关键词…"
                 />
                 <button

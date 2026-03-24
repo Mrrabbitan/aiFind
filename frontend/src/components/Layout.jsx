@@ -7,8 +7,13 @@ import {
   BookOpen,
   Library,
   Zap,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import Copilot from "./Copilot";
+import { getTheme, setTheme } from "../theme";
 
 const navItems = [
   { to: "/", end: true, label: "工作台", Icon: LayoutDashboard },
@@ -31,9 +36,30 @@ const PAGE_TITLES = {
 export default function Layout() {
   const { pathname } = useLocation();
   const pageTitle = PAGE_TITLES[pathname] ?? "智能订单采集运营平台";
+  const [theme, setThemeState] = useState(() => getTheme());
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => {
+      if (getTheme() === "system") {
+        setThemeState("system");
+      }
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  const cycleTheme = () => {
+    const next = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
+    setTheme(next);
+    setThemeState(next);
+  };
+
+  const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+  const themeLabel = theme === "light" ? "浅色" : theme === "dark" ? "深色" : "跟随系统";
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <aside className="flex w-60 shrink-0 flex-col bg-slate-900 text-white">
         <div className="flex items-center gap-2 border-b border-slate-800 px-4 py-5">
           <Zap className="h-8 w-8 shrink-0 text-indigo-400" aria-hidden />
@@ -64,10 +90,21 @@ export default function Layout() {
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="shrink-0 border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
-          <h1 className="text-lg font-semibold tracking-tight text-slate-900">
-            {pageTitle}
-          </h1>
+        <header className="shrink-0 border-b border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+              {pageTitle}
+            </h1>
+            <button
+              type="button"
+              onClick={cycleTheme}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              title={`当前主题：${themeLabel}（点击切换）`}
+            >
+              <ThemeIcon className="h-4 w-4" />
+              <span>{themeLabel}</span>
+            </button>
+          </div>
         </header>
         <main className="min-h-0 flex-1 overflow-auto p-6">
           <Outlet />

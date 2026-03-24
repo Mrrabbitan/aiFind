@@ -290,7 +290,7 @@ export default function Knowledge() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-slate-900 dark:text-slate-100">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="relative max-w-xl flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -299,7 +299,7 @@ export default function Knowledge() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索知识库..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
         <button
@@ -325,7 +325,7 @@ export default function Knowledge() {
               "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
               category === id
                 ? "bg-slate-900 text-white"
-                : "text-slate-600 hover:bg-slate-100",
+                : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800",
             ].join(" ")}
           >
             <Icon className="h-4 w-4 opacity-80" />
@@ -430,8 +430,8 @@ export default function Knowledge() {
                   }
                 }}
                 className={[
-                  "flex flex-col rounded-xl border bg-white p-4 text-left shadow-sm transition-all outline-none ring-indigo-500 hover:shadow-md focus-visible:ring-2",
-                  expanded ? "border-indigo-200 ring-1 ring-indigo-100" : "border-slate-200",
+                  "flex flex-col rounded-xl border bg-white p-4 text-left shadow-sm transition-all outline-none ring-indigo-500 hover:shadow-md focus-visible:ring-2 dark:bg-slate-900",
+                  expanded ? "border-indigo-200 ring-1 ring-indigo-100 dark:border-indigo-700" : "border-slate-200 dark:border-slate-700",
                 ].join(" ")}
               >
                 <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -442,26 +442,26 @@ export default function Knowledge() {
                     {categoryLabel(cat)}
                   </span>
                 </div>
-                <h3 className="text-base font-semibold text-slate-900">{a.title}</h3>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{a.title}</h3>
                 <div className="mt-2 flex flex-wrap gap-1">
                   {tags.map((t) => (
                     <span
                       key={t}
-                      className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600"
+                    className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
                     >
                       {t}
                     </span>
                   ))}
                 </div>
                 {!expanded && (
-                  <p className="mt-3 line-clamp-3 text-sm text-slate-600">{preview}</p>
+                  <p className="mt-3 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">{preview}</p>
                 )}
                 {expanded && (
-                  <div className="mt-3 border-t border-slate-100 pt-3">
+                  <div className="mt-3 border-t border-slate-100 pt-3 dark:border-slate-800">
                     <MarkdownBasic content={a.content} />
                   </div>
                 )}
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-50 pt-3">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-50 pt-3 dark:border-slate-800">
                   <div className="flex items-center gap-3 text-xs text-slate-500">
                     <span className="inline-flex items-center gap-1">
                       <Eye className="h-3.5 w-3.5" />

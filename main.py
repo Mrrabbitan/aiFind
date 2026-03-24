@@ -4,6 +4,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from fastapi import FastAPI
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -37,9 +38,21 @@ app.include_router(manual.router)
 app.include_router(skills.router)
 app.include_router(auth.router)
 
+
+class SPAStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope) -> Response:
+        try:
+            return await super().get_response(path, scope)
+        except Exception as exc:
+            # SPA 深链路刷新时，回退到 index.html 交给前端路由处理。
+            if getattr(exc, "status_code", None) == 404:
+                return await super().get_response("index.html", scope)
+            raise
+
+
 dist = os.path.join(os.path.dirname(__file__), "frontend", "dist")
 if os.path.isdir(dist):
-    app.mount("/", StaticFiles(directory=dist, html=True), name="spa")
+    app.mount("/", SPAStaticFiles(directory=dist, html=True), name="spa")
 
 
 if __name__ == "__main__":

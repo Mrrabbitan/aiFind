@@ -33,13 +33,13 @@ function Modal({ open, title, onClose, children }) {
         aria-label="关闭"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-          <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+      <div className="relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+            className="rounded-lg p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <X className="h-5 w-5" />
           </button>
@@ -169,9 +169,9 @@ export default function ParamManager() {
       : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-slate-900 dark:text-slate-100">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold tracking-tight text-slate-900">
+        <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
           参数管理
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -194,7 +194,7 @@ export default function ParamManager() {
               setValidateResults(null);
               setValidateError(null);
             }}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
           >
             <ShieldCheck className="h-4 w-4 text-indigo-600" />
             参数校验
@@ -209,7 +209,7 @@ export default function ParamManager() {
       >
         <form onSubmit={submitRecommend} className="space-y-4">
           <div>
-            <label htmlFor="table_name" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="table_name" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               表名 (table_name)
             </label>
             <input
@@ -217,7 +217,7 @@ export default function ParamManager() {
               value={tableName}
               onChange={(e) => setTableName(e.target.value)}
               placeholder="例如 tf_oh_special_blacklist"
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               required
             />
           </div>
@@ -238,7 +238,7 @@ export default function ParamManager() {
           <p className="mt-3 text-sm text-red-600">{recommendError}</p>
         )}
         {recommendResult && (
-          <div className="mt-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white p-4 shadow-sm">
+          <div className="mt-5 rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50/80 to-white p-4 shadow-sm dark:border-indigo-900/50 dark:from-slate-800 dark:to-slate-900">
             <p className="text-xs font-medium uppercase tracking-wide text-indigo-600">
               推荐结果
             </p>
@@ -290,7 +290,7 @@ export default function ParamManager() {
       >
         <form onSubmit={submitValidate} className="space-y-4">
           <div>
-            <label htmlFor="params_json" className="mb-1 block text-sm font-medium text-slate-700">
+            <label htmlFor="params_json" className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
               参数 JSON
             </label>
             <textarea
@@ -298,7 +298,7 @@ export default function ParamManager() {
               value={paramsJson}
               onChange={(e) => setParamsJson(e.target.value)}
               rows={10}
-              className="w-full resize-y rounded-lg border border-slate-200 px-3 py-2 font-mono text-xs leading-relaxed outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2"
+              className="w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-xs leading-relaxed text-slate-900 outline-none ring-indigo-500 focus:border-indigo-500 focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
           </div>
           <button
@@ -345,8 +345,8 @@ export default function ParamManager() {
         )}
       </Modal>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold text-slate-800">参数模板</h3>
+      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <h3 className="mb-4 text-sm font-semibold text-slate-800 dark:text-slate-200">参数模板</h3>
         {listLoading && (
           <div className="flex min-h-[160px] items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" aria-hidden />
