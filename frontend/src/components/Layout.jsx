@@ -8,6 +8,7 @@ import {
   Library,
   Zap,
 } from "lucide-react";
+import Copilot from "./Copilot";
 
 const navItems = [
   { to: "/", end: true, label: "工作台", Icon: LayoutDashboard },
@@ -72,6 +73,7 @@ export default function Layout() {
           <Outlet />
         </main>
       </div>
+      <Copilot />
     </div>
   );
 }
