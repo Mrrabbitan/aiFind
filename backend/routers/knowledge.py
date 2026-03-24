@@ -19,6 +19,7 @@ class CreateArticleReq(BaseModel):
 
 @router.get("")
 def list_articles(category: Optional[str] = None, q: Optional[str] = None,
+                  page: int = 1, page_size: int = 10,
                   db: Session = Depends(get_db)):
     # 懒加载补充：确保知识库包含“第二个 sheet 全量内容”
     target_title = "订单采集场景第二个Sheet全量内容"
@@ -51,22 +52,41 @@ def list_articles(category: Optional[str] = None, q: Optional[str] = None,
         )
         db.commit()
 
-    query = db.query(KnowledgeArticle)
+    query_obj = db.query(KnowledgeArticle)
     if category:
-        query = query.filter(KnowledgeArticle.category == category)
-    articles = query.order_by(KnowledgeArticle.created_at.desc()).all()
-    items = [
-        {
-            "id": a.id, "title": a.title, "category": a.category,
-            "tags": a.tags, "content": a.content, "source": a.source,
-            "views": a.views, "helpful": a.helpful,
-            "created_at": str(a.created_at) if a.created_at else None,
-        }
-        for a in articles
-    ]
+        query_obj = query_obj.filter(KnowledgeArticle.category == category)
+
     if q:
-        items = search_knowledge(q, items)
-    return items
+        articles = query_obj.order_by(KnowledgeArticle.created_at.desc()).all()
+        all_items = [
+            {
+                "id": a.id, "title": a.title, "category": a.category,
+                "tags": a.tags, "content": a.content, "source": a.source,
+                "views": a.views, "helpful": a.helpful,
+                "created_at": str(a.created_at) if a.created_at else None,
+            }
+            for a in articles
+        ]
+        all_items = search_knowledge(q, all_items)
+        total = len(all_items)
+        total_pages = max(1, -(-total // page_size))
+        start = (page - 1) * page_size
+        items = all_items[start:start + page_size]
+    else:
+        total = query_obj.count()
+        total_pages = max(1, -(-total // page_size))
+        articles = query_obj.order_by(KnowledgeArticle.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+        items = [
+            {
+                "id": a.id, "title": a.title, "category": a.category,
+                "tags": a.tags, "content": a.content, "source": a.source,
+                "views": a.views, "helpful": a.helpful,
+                "created_at": str(a.created_at) if a.created_at else None,
+            }
+            for a in articles
+        ]
+
+    return {"items": items, "total": total, "page": page, "page_size": page_size, "total_pages": total_pages}
 
 
 @router.post("")

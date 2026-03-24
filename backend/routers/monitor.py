@@ -136,14 +136,17 @@ def _compute_health_from_metrics(db: Session) -> Dict[str, Any]:
 @router.get("/events")
 def list_events(
     severity: Optional[str] = None,
-    limit: int = 30,
+    page: int = 1,
+    page_size: int = 10,
     db: Session = Depends(get_db),
 ):
     q = db.query(MonitorEvent)
     if severity:
         q = q.filter(MonitorEvent.severity == severity)
-    events = q.order_by(MonitorEvent.created_at.desc()).limit(limit).all()
-    return [
+    total = q.count()
+    total_pages = max(1, -(-total // page_size))
+    events = q.order_by(MonitorEvent.created_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+    items = [
         {
             "id": e.id,
             "task_id": e.task_id,
@@ -157,6 +160,7 @@ def list_events(
         }
         for e in events
     ]
+    return {"items": items, "total": total, "page": page, "page_size": page_size, "total_pages": total_pages}
 
 
 @router.get("/metrics")

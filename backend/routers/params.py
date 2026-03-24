@@ -26,9 +26,17 @@ class RecommendReq(BaseModel):
 
 
 @router.get("")
-def list_templates(db: Session = Depends(get_db)):
-    tpls = db.query(ParamTemplate).order_by(ParamTemplate.created_at.desc()).all()
-    return [
+def list_templates(page: int = 1, page_size: int = 10, db: Session = Depends(get_db)):
+    total = db.query(ParamTemplate).count()
+    total_pages = max(1, -(-total // page_size))
+    tpls = (
+        db.query(ParamTemplate)
+        .order_by(ParamTemplate.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    items = [
         {
             "id": t.id, "name": t.name, "category": t.category,
             "table_pattern": t.table_pattern, "params": t.params or {},
@@ -37,6 +45,7 @@ def list_templates(db: Session = Depends(get_db)):
         }
         for t in tpls
     ]
+    return {"items": items, "total": total, "page": page, "page_size": page_size, "total_pages": total_pages}
 
 
 @router.post("")
